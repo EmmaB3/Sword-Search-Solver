@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Sword Search Solver</title>
+        <style>
+            .redText{
+                color: red;
+            }
+
+            table{
+                margin-left:auto;
+                margin-right:auto;
+            }
+
+            td{
+                text-align: center;
+                width: 25px;
+                height: 25px;
+            }
+            #message{
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="SwordSearch.js"></script>
+        <button onclick="main()">Search For A Word</button>
+        <table id = "searchDisplay"></table>
+        <script>drawSearch()</script>
+        <p id = "message" class = "redText"></p>
+    </body>
+</html>
