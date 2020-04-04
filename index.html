@@ -13,6 +13,13 @@
                 margin-right:auto;
             }
 
+            button{
+                position:relative;
+                left: 50%;
+                width: 100px;
+                margin: 0px -50px;
+            }
+
             td{
                 text-align: center;
                 width: 25px;
@@ -25,7 +32,7 @@
     </head>
     <body>
         <script src="SwordSearch.js"></script>
-        <button onclick="main()">Search For A Word</button>
+        <button onclick="main()">Search for a Word</button>
         <table id = "searchDisplay"></table>
         <script>drawSearch()</script>
         <p id = "message" class = "redText"></p>

@@ -26,12 +26,14 @@ let HTMLSearch = [];
 
 function main(){
     let word = prompt("Enter Word:").toLowerCase();
-    let firstLetter = searchFor(word);
+    let wordInstances = searchFor(word);
     eraseFindings();
-    if (firstLetter.xCoord == -1)
+    if (wordInstances[0].xCoord == -1)
        document.getElementById("message").innerHTML = "Word Not Found";
 	else{
-        showWord(firstLetter, word.length, 0);
+        for(let a = 0; a < wordInstances.length; a++){
+            showWord(wordInstances[a], word.length, 0);
+        }
     }
 }
 
@@ -68,17 +70,21 @@ function showWord(currentLetter, wordLength, currentIndex){
 }
 
 function searchFor(word) {
+    let instances = [];
 	for (let y = 0; y < ROW_LENGTH; y++) {
 		for (let x = 0; x < ROW_LENGTH; x++) {
 			if (SWORD_SEARCH[y][x] == word.charAt(0)) {
                 let nextLetter = searchSurroundings(x, y, word.charAt(1));
 				if (recursiveSearch(nextLetter, word, 2)){
-                    return {xCoord:x, yCoord:y, direction: nextLetter.direction};
+                    instances.push({xCoord:x, yCoord:y, direction: nextLetter.direction});
                 }
             }
         }
-	}
-	return {xCoord:-1, yCoord:-1, direction: {xOffset: 0, yOffset: 0}};
+    }
+    if(instances.length == 0){
+        instances.push({xCoord:-1, yCoord:-1, direction: {xOffset: 0, yOffset: 0}});
+    }
+    return instances;
 }
 
 function validPosition(x, y) {
