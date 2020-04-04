@@ -27,10 +27,10 @@ let HTMLSearch = [];
 function main(){
     let word = prompt("Enter Word:");
     let firstLetter = searchFor(word);
+    eraseFindings();
     if (firstLetter.xCoord == -1)
        document.getElementById("message").innerHTML = "Word Not Found";
 	else{
-        console.log("Starts at (" + firstLetter.xCoord + "," + firstLetter.yCoord + ")");
         showWord(firstLetter, word.length, 0);
     }
 }
@@ -48,6 +48,15 @@ function drawSearch(){
         HTMLSearch.push(rowArr);
         document.getElementById("searchDisplay").appendChild(row);
     }
+}
+
+function eraseFindings(){
+    for(let a = 0; a < ROW_LENGTH; a++){
+        for(let b = 0; b < ROW_LENGTH; b++){
+            HTMLSearch[b][a].classList.remove("redText");
+        }
+    }
+    document.getElementById("message").innerHTML = "";
 }
 
 function showWord(currentLetter, wordLength, currentIndex){
