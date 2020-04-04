@@ -29,12 +29,14 @@ function main(){
     let wordInstances = searchFor(word);
     eraseFindings();
     if (wordInstances[0].xCoord == -1)
-       document.getElementById("message").innerHTML = "Word Not Found";
+       instancesCount = 0;
 	else{
+        instancesCount = wordInstances.length;
         for(let a = 0; a < wordInstances.length; a++){
             showWord(wordInstances[a], word.length, 0);
         }
     }
+    document.getElementById("message").innerHTML = instancesCount + (instancesCount == 1 ? " instance" : " instances") + " found";
 }
 
 function drawSearch(){
