@@ -25,7 +25,7 @@ let SWORD_SEARCH = [
 let HTMLSearch = [];
 
 function main(){
-    let word = prompt("Enter Word:");
+    let word = prompt("Enter Word:").toLowerCase();
     let firstLetter = searchFor(word);
     eraseFindings();
     if (firstLetter.xCoord == -1)
