@@ -111,7 +111,7 @@ function searchForWeird(word) {
 		for (let x = 0; x < ROW_LENGTH; x++) {
 			if (SWORD_SEARCH[y][x] == word.charAt(0)) {
                 let nextLetter = searchSurroundingsWeird(x, y, word.charAt(1));
-				if (recursiveSearch(nextLetter, word, 2, true, 0)){
+				if (recursiveSearch(nextLetter, word, 1, true, 0)){
                     instances.push({xCoord:x, yCoord:y, direction: nextLetter.direction});
                 }
             }
@@ -168,7 +168,7 @@ function searchSurroundingsWeird(x, y, letter) {
                     if(Math.abs(yOffset) == 2){
                         yOffset = Math.sign(yOffset);
                     }
-					return {xCoord: (x + xOffset), yCoord: (y + yOffset), direction: {xOffset: xOffset, yOffset: yOffset} };	
+					return {xCoord: x, yCoord: y, direction: {xOffset: xOffset, yOffset: yOffset} };	
 				}
 			}
 		}
