@@ -24,32 +24,14 @@ let SWORD_SEARCH = [
 
 let HTMLSearch = [];
 
-function findWord(){
+function findWord(isWeird){
     let word = prompt("Enter Word:").toLowerCase();
-    let wordInstances = searchFor(word);
+    let wordInstances = searchFor(word, isWeird);
     eraseFindings();
-    if (wordInstances[0].xCoord == -1)
-       instancesCount = 0;
-	else{
-        instancesCount = wordInstances.length;
-        for(let a = 0; a < wordInstances.length; a++){
-            showWord(wordInstances[a], word.length, 0, false);
-        }
-    }
-    document.getElementById("message").innerHTML = instancesCount + (instancesCount == 1 ? " instance" : " instances") + " found";
-}
 
-function findWeirdWord(){
-    let word = prompt("Enter Word:").toLowerCase();
-    let wordInstances = searchForWeird(word);
-    eraseFindings();
-    if (wordInstances[0].xCoord == -1)
-       instancesCount = 0;
-	else{
-        instancesCount = wordInstances.length;
-        for(let a = 0; a < wordInstances.length; a++){
-            showWord(wordInstances[a], word.length, 0, true);
-        }
+    instancesCount = wordInstances.length;
+    for(let a = 0; a < wordInstances.length; a++){
+        showWord(wordInstances[a], word.length + (isWeird ? 1 : 0), 0);
     }
     document.getElementById("message").innerHTML = instancesCount + (instancesCount == 1 ? " instance" : " instances") + " found";
 }
@@ -78,8 +60,7 @@ function eraseFindings(){
     document.getElementById("message").innerHTML = "";
 }
 
-function showWord(currentLetter, wordLength, currentIndex ,isWeird){
-    wordLength += isWeird ? 1 : 0;
+function showWord(currentLetter, wordLength, currentIndex){
     if(currentIndex < wordLength){
         HTMLSearch[currentLetter.yCoord][currentLetter.xCoord].className = "redText";
         showWord({ xCoord: currentLetter.xCoord + currentLetter.direction.xOffset , yCoord: currentLetter.yCoord + currentLetter.direction.yOffset, direction: currentLetter.direction}, wordLength, currentIndex + 1)
@@ -87,38 +68,19 @@ function showWord(currentLetter, wordLength, currentIndex ,isWeird){
     
 }
 
-function searchFor(word) {
+function searchFor(word, isWeird) {
     let instances = [];
 	for (let y = 0; y < ROW_LENGTH; y++) {
 		for (let x = 0; x < ROW_LENGTH; x++) {
 			if (SWORD_SEARCH[y][x] == word.charAt(0)) {
-                let nextLetter = searchSurroundings(x, y, word.charAt(1));
-				if (recursiveSearch(nextLetter, word, 2, true, 0)){
-                    instances.push({xCoord:x, yCoord:y, direction: nextLetter.direction});
+                let possibleNextLetters = searchSurroundings(x, y, word.charAt(1), isWeird);
+                for(let a = 0; a < possibleNextLetters.length; a++){
+                    if (recursiveSearch(possibleNextLetters[a], word, 1, isWeird ? 0 : 1)){
+                        instances.push({xCoord:x, yCoord:y, direction: possibleNextLetters[a].direction});
+                    }
                 }
             }
         }
-    }
-    if(instances.length == 0){
-        instances.push({xCoord:-1, yCoord:-1, direction: {xOffset: 0, yOffset: 0}});
-    }
-    return instances;
-}
-
-function searchForWeird(word) {
-    let instances = [];
-	for (let y = 0; y < ROW_LENGTH; y++) {
-		for (let x = 0; x < ROW_LENGTH; x++) {
-			if (SWORD_SEARCH[y][x] == word.charAt(0)) {
-                let nextLetter = searchSurroundings(x, y, word.charAt(1));
-				if (recursiveSearch(nextLetter, word, 2, true, 0)){
-                    instances.push({xCoord:x, yCoord:y, direction: nextLetter.direction});
-                }
-            }
-        }
-    }
-    if(instances.length == 0){
-        instances.push({xCoord:-1, yCoord:-1, direction: {xOffset: 0, yOffset: 0}});
     }
     return instances;
 }
@@ -127,31 +89,33 @@ function validPosition(x, y) {
 	return x >= 0 && x < ROW_LENGTH && y >= 0 && y < ROW_LENGTH;
 }
 
-function recursiveSearch(currentLetter, word, checkingIndex, isWeird, incorrectCount){
+function recursiveSearch(currentLetter, word, checkingIndex, incorrectCount){
 	if(checkingIndex >= word.length){
 		return true;
 	}
-	if (!validPosition(currentLetter.xCoord + currentLetter.direction.xOffset, currentLetter.yCoord + currentLetter.direction.yOffset)) {
+	if (!validPosition(currentLetter.xCoord, currentLetter.yCoord)) {
 		return false;
-	}
-	if(word[checkingIndex] == SWORD_SEARCH[currentLetter.yCoord + currentLetter.direction.yOffset][currentLetter.xCoord + currentLetter.direction.xOffset]){
+    }
+	if(word.charAt(checkingIndex) == SWORD_SEARCH[currentLetter.yCoord][currentLetter.xCoord]){
 		return recursiveSearch({ xCoord: currentLetter.xCoord + currentLetter.direction.xOffset , yCoord: currentLetter.yCoord + currentLetter.direction.yOffset, direction: currentLetter.direction}, word, checkingIndex + 1, incorrectCount);
     }
-    if(isWeird && incorrectCount == 0){
+    if(incorrectCount == 0){
         return recursiveSearch({ xCoord: currentLetter.xCoord + currentLetter.direction.xOffset , yCoord: currentLetter.yCoord + currentLetter.direction.yOffset, direction: currentLetter.direction}, word, checkingIndex, 1);
     }
 	return false;
 }
 
-function searchSurroundings(x, y, letter) {
-	for (let yOffset = -1; yOffset <= 1; yOffset++) {
-		for (let xOffset = - 1; xOffset <= 1; xOffset++) {
+function searchSurroundings(x, y, letter, isWeird) {
+    let possibleWords = [];
+    let range = isWeird ? 2 : 1;
+	for (let yOffset = -range; yOffset <= range; yOffset++) {
+		for (let xOffset = - range; xOffset <= range; xOffset++) {
 			if (validPosition(x + xOffset, y + yOffset) && !(xOffset == 0 && yOffset == 0)) {
 				if (SWORD_SEARCH[y + yOffset][x + xOffset] == letter) {
-					return {xCoord: (x + xOffset), yCoord: (y + yOffset), direction: {xOffset: xOffset, yOffset: yOffset} };	
+					possibleWords.push( {xCoord: (x + Math.sign(xOffset)), yCoord: (y + Math.sign(yOffset)), direction: {xOffset: Math.sign(xOffset), yOffset: Math.sign(yOffset)} });	
 				}
 			}
 		}
 	}
-	return {xCoord:-1, yCoord:-1, direction: {xOffset: 0, yOffset: 0}};
+	return possibleWords;
 }

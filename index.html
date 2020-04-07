@@ -8,7 +8,7 @@
                 color: red;
                 font-weight: bold;
             }
-
+            
             table{
                 margin-left:auto;
                 margin-right:auto;
@@ -33,8 +33,8 @@
     </head>
     <body>
         <script src="SwordSearch.js"></script>
-        <button onclick="findWord()">Search for a Word</button>
-        <button onclick="findWeirdWord()">Search for a Weird Word</button>
+        <button onclick="findWord(false)">Search for a Word</button>
+        <button onclick="findWord(true)">Search for a Weird Word</button>
         <table id = "searchDisplay"></table>
         <script>drawSearch()</script>
         <p id = "message" class = "redText"></p>
