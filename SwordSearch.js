@@ -110,7 +110,7 @@ function searchForWeird(word) {
 	for (let y = 0; y < ROW_LENGTH; y++) {
 		for (let x = 0; x < ROW_LENGTH; x++) {
 			if (SWORD_SEARCH[y][x] == word.charAt(0)) {
-                let nextLetter = searchSurroundings(x, y, word.charAt(1));
+                let nextLetter = searchSurroundingsWeird(x, y, word.charAt(1));
 				if (recursiveSearch(nextLetter, word, 2, true, 0)){
                     instances.push({xCoord:x, yCoord:y, direction: nextLetter.direction});
                 }
@@ -128,16 +128,17 @@ function validPosition(x, y) {
 }
 
 function recursiveSearch(currentLetter, word, checkingIndex, isWeird, incorrectCount){
-	if(checkingIndex >= word.length){
+	if(checkingIndex >= (word.length + (isWeird ? 1 : 0))){
 		return true;
 	}
 	if (!validPosition(currentLetter.xCoord + currentLetter.direction.xOffset, currentLetter.yCoord + currentLetter.direction.yOffset)) {
 		return false;
-	}
+    }
 	if(word[checkingIndex] == SWORD_SEARCH[currentLetter.yCoord + currentLetter.direction.yOffset][currentLetter.xCoord + currentLetter.direction.xOffset]){
 		return recursiveSearch({ xCoord: currentLetter.xCoord + currentLetter.direction.xOffset , yCoord: currentLetter.yCoord + currentLetter.direction.yOffset, direction: currentLetter.direction}, word, checkingIndex + 1, incorrectCount);
     }
     if(isWeird && incorrectCount == 0){
+        console.log(SWORD_SEARCH[currentLetter.yCoord + currentLetter.direction.yOffset][currentLetter.xCoord + currentLetter.direction.yOffset] + " " + currentLetter.xCoord + "," + currentLetter.yCoord);
         return recursiveSearch({ xCoord: currentLetter.xCoord + currentLetter.direction.xOffset , yCoord: currentLetter.yCoord + currentLetter.direction.yOffset, direction: currentLetter.direction}, word, checkingIndex, 1);
     }
 	return false;
@@ -148,6 +149,25 @@ function searchSurroundings(x, y, letter) {
 		for (let xOffset = - 1; xOffset <= 1; xOffset++) {
 			if (validPosition(x + xOffset, y + yOffset) && !(xOffset == 0 && yOffset == 0)) {
 				if (SWORD_SEARCH[y + yOffset][x + xOffset] == letter) {
+					return {xCoord: (x + xOffset), yCoord: (y + yOffset), direction: {xOffset: xOffset, yOffset: yOffset} };	
+				}
+			}
+		}
+	}
+	return {xCoord:-1, yCoord:-1, direction: {xOffset: 0, yOffset: 0}};
+}
+
+function searchSurroundingsWeird(x, y, letter) {
+	for (let yOffset = -2; yOffset <= 2; yOffset++) {
+		for (let xOffset = - 2; xOffset <= 2; xOffset++) {
+			if (validPosition(x + xOffset, y + yOffset) && !(xOffset == 0 && yOffset == 0)) {
+				if (SWORD_SEARCH[y + yOffset][x + xOffset] == letter) {
+                    if(Math.abs(xOffset) == 2){
+                        xOffset = Math.sign(xOffset);
+                    }
+                    if(Math.abs(yOffset) == 2){
+                        yOffset = Math.sign(yOffset);
+                    }
 					return {xCoord: (x + xOffset), yCoord: (y + yOffset), direction: {xOffset: xOffset, yOffset: yOffset} };	
 				}
 			}
