@@ -93,7 +93,7 @@ function searchFor(word) {
 		for (let x = 0; x < ROW_LENGTH; x++) {
 			if (SWORD_SEARCH[y][x] == word.charAt(0)) {
                 let nextLetter = searchSurroundings(x, y, word.charAt(1));
-				if (recursiveSearch(nextLetter, word, 2, true, 0)){
+				if (recursiveSearch(nextLetter, word, 1, false, 0)){
                     instances.push({xCoord:x, yCoord:y, direction: nextLetter.direction});
                 }
             }
@@ -128,19 +128,22 @@ function validPosition(x, y) {
 }
 
 function recursiveSearch(currentLetter, word, checkingIndex, isWeird, incorrectCount){
-	if(checkingIndex >= (word.length + (isWeird ? 1 : 0))){
+	if(checkingIndex >= word.length){
 		return true;
 	}
-	if (!validPosition(currentLetter.xCoord + currentLetter.direction.xOffset, currentLetter.yCoord + currentLetter.direction.yOffset)) {
+	if (!validPosition(currentLetter.xCoord, currentLetter.yCoord)) {
 		return false;
     }
-	if(word[checkingIndex] == SWORD_SEARCH[currentLetter.yCoord + currentLetter.direction.yOffset][currentLetter.xCoord + currentLetter.direction.xOffset]){
+	if(word[checkingIndex] == SWORD_SEARCH[currentLetter.yCoord][currentLetter.xCoord]){
+        HTMLSearch[currentLetter.yCoord][currentLetter.xCoord].className = "greenText";
 		return recursiveSearch({ xCoord: currentLetter.xCoord + currentLetter.direction.xOffset , yCoord: currentLetter.yCoord + currentLetter.direction.yOffset, direction: currentLetter.direction}, word, checkingIndex + 1, incorrectCount);
     }
     if(isWeird && incorrectCount == 0){
-        console.log(SWORD_SEARCH[currentLetter.yCoord + currentLetter.direction.yOffset][currentLetter.xCoord + currentLetter.direction.yOffset] + " " + currentLetter.xCoord + "," + currentLetter.yCoord);
+        HTMLSearch[currentLetter.yCoord][currentLetter.xCoord].className = "blueText";
         return recursiveSearch({ xCoord: currentLetter.xCoord + currentLetter.direction.xOffset , yCoord: currentLetter.yCoord + currentLetter.direction.yOffset, direction: currentLetter.direction}, word, checkingIndex, 1);
     }
+    HTMLSearch[currentLetter.yCoord][currentLetter.xCoord].className = "orangeText";
+    console.log(SWORD_SEARCH[currentLetter.yCoord][currentLetter.xCoord] + " " + (currentLetter.xCoord) + "," + (currentLetter.yCoord));
 	return false;
 }
 
@@ -149,7 +152,7 @@ function searchSurroundings(x, y, letter) {
 		for (let xOffset = - 1; xOffset <= 1; xOffset++) {
 			if (validPosition(x + xOffset, y + yOffset) && !(xOffset == 0 && yOffset == 0)) {
 				if (SWORD_SEARCH[y + yOffset][x + xOffset] == letter) {
-					return {xCoord: (x + xOffset), yCoord: (y + yOffset), direction: {xOffset: xOffset, yOffset: yOffset} };	
+					return {xCoord: x + xOffset, yCoord: y + yOffset, direction: {xOffset: xOffset, yOffset: yOffset} };	
 				}
 			}
 		}
@@ -168,7 +171,7 @@ function searchSurroundingsWeird(x, y, letter) {
                     if(Math.abs(yOffset) == 2){
                         yOffset = Math.sign(yOffset);
                     }
-					return {xCoord: x, yCoord: y, direction: {xOffset: xOffset, yOffset: yOffset} };	
+					return {xCoord: x + xOffset, yCoord: y + yOffset, direction: {xOffset: xOffset, yOffset: yOffset} };	
 				}
 			}
 		}
