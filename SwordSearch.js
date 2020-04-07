@@ -24,7 +24,7 @@ let SWORD_SEARCH = [
 
 let HTMLSearch = [];
 
-function main(){
+function findWord(){
     let word = prompt("Enter Word:").toLowerCase();
     let wordInstances = searchFor(word);
     eraseFindings();
@@ -33,7 +33,22 @@ function main(){
 	else{
         instancesCount = wordInstances.length;
         for(let a = 0; a < wordInstances.length; a++){
-            showWord(wordInstances[a], word.length, 0);
+            showWord(wordInstances[a], word.length, 0, false);
+        }
+    }
+    document.getElementById("message").innerHTML = instancesCount + (instancesCount == 1 ? " instance" : " instances") + " found";
+}
+
+function findWeirdWord(){
+    let word = prompt("Enter Word:").toLowerCase();
+    let wordInstances = searchForWeird(word);
+    eraseFindings();
+    if (wordInstances[0].xCoord == -1)
+       instancesCount = 0;
+	else{
+        instancesCount = wordInstances.length;
+        for(let a = 0; a < wordInstances.length; a++){
+            showWord(wordInstances[a], word.length, 0, true);
         }
     }
     document.getElementById("message").innerHTML = instancesCount + (instancesCount == 1 ? " instance" : " instances") + " found";
@@ -63,7 +78,8 @@ function eraseFindings(){
     document.getElementById("message").innerHTML = "";
 }
 
-function showWord(currentLetter, wordLength, currentIndex){
+function showWord(currentLetter, wordLength, currentIndex ,isWeird){
+    wordLength += isWeird ? 1 : 0;
     if(currentIndex < wordLength){
         HTMLSearch[currentLetter.yCoord][currentLetter.xCoord].className = "redText";
         showWord({ xCoord: currentLetter.xCoord + currentLetter.direction.xOffset , yCoord: currentLetter.yCoord + currentLetter.direction.yOffset, direction: currentLetter.direction}, wordLength, currentIndex + 1)
@@ -77,7 +93,25 @@ function searchFor(word) {
 		for (let x = 0; x < ROW_LENGTH; x++) {
 			if (SWORD_SEARCH[y][x] == word.charAt(0)) {
                 let nextLetter = searchSurroundings(x, y, word.charAt(1));
-				if (recursiveSearch(nextLetter, word, 2)){
+				if (recursiveSearch(nextLetter, word, 2, true, 0)){
+                    instances.push({xCoord:x, yCoord:y, direction: nextLetter.direction});
+                }
+            }
+        }
+    }
+    if(instances.length == 0){
+        instances.push({xCoord:-1, yCoord:-1, direction: {xOffset: 0, yOffset: 0}});
+    }
+    return instances;
+}
+
+function searchForWeird(word) {
+    let instances = [];
+	for (let y = 0; y < ROW_LENGTH; y++) {
+		for (let x = 0; x < ROW_LENGTH; x++) {
+			if (SWORD_SEARCH[y][x] == word.charAt(0)) {
+                let nextLetter = searchSurroundings(x, y, word.charAt(1));
+				if (recursiveSearch(nextLetter, word, 2, true, 0)){
                     instances.push({xCoord:x, yCoord:y, direction: nextLetter.direction});
                 }
             }
@@ -93,7 +127,7 @@ function validPosition(x, y) {
 	return x >= 0 && x < ROW_LENGTH && y >= 0 && y < ROW_LENGTH;
 }
 
-function recursiveSearch(currentLetter, word, checkingIndex){
+function recursiveSearch(currentLetter, word, checkingIndex, isWeird, incorrectCount){
 	if(checkingIndex >= word.length){
 		return true;
 	}
@@ -101,8 +135,11 @@ function recursiveSearch(currentLetter, word, checkingIndex){
 		return false;
 	}
 	if(word[checkingIndex] == SWORD_SEARCH[currentLetter.yCoord + currentLetter.direction.yOffset][currentLetter.xCoord + currentLetter.direction.xOffset]){
-		return recursiveSearch({ xCoord: currentLetter.xCoord + currentLetter.direction.xOffset , yCoord: currentLetter.yCoord + currentLetter.direction.yOffset, direction: currentLetter.direction}, word, checkingIndex + 1);
-	}
+		return recursiveSearch({ xCoord: currentLetter.xCoord + currentLetter.direction.xOffset , yCoord: currentLetter.yCoord + currentLetter.direction.yOffset, direction: currentLetter.direction}, word, checkingIndex + 1, incorrectCount);
+    }
+    if(isWeird && incorrectCount == 0){
+        return recursiveSearch({ xCoord: currentLetter.xCoord + currentLetter.direction.xOffset , yCoord: currentLetter.yCoord + currentLetter.direction.yOffset, direction: currentLetter.direction}, word, checkingIndex, 1);
+    }
 	return false;
 }
 
