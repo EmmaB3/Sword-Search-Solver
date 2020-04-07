@@ -165,13 +165,7 @@ function searchSurroundingsWeird(x, y, letter) {
 		for (let xOffset = - 2; xOffset <= 2; xOffset++) {
 			if (validPosition(x + xOffset, y + yOffset) && !(xOffset == 0 && yOffset == 0)) {
 				if (SWORD_SEARCH[y + yOffset][x + xOffset] == letter) {
-                    if(Math.abs(xOffset) == 2){
-                        xOffset = Math.sign(xOffset);
-                    }
-                    if(Math.abs(yOffset) == 2){
-                        yOffset = Math.sign(yOffset);
-                    }
-					return {xCoord: x + xOffset, yCoord: y + yOffset, direction: {xOffset: xOffset, yOffset: yOffset} };	
+					return {xCoord: x + xOffset, yCoord: y + yOffset, direction: {xOffset: Math.sign(xOffset), yOffset: Math.sign(yOffset)} };	
 				}
 			}
 		}
